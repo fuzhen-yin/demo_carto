@@ -1,0 +1,71 @@
+<html>
+
+<head>
+    <title>Inconsistent Manual Annotation </title>
+</head>
+
+<body>
+    <h1>Inconsistent Manual Annotation - 148 records </h1>
+    <p>Discussing consistent image labeling.  </p>
+
+    <p id="img_data_container"> </p>
+</body>
+
+
+<script>
+
+    // Replace with the actual URL of your JSON data
+    const url = 'https://raw.githubusercontent.com/fuzhen-yin/2025_carto_test/refs/heads/main/anno_data/0801_anno_to_discuss.json'; 
+
+    fetch(url)
+    .then(response => {
+    // Check if the request was successful
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        // Parse the JSON data from the response
+        return response.json(); 
+            })
+            .then(data => {
+                // Work with the JSON data here
+                console.log(data); 
+
+                // Example: Displaying user names in the div
+                const dataContainer = document.getElementById('img_data_container');
+                data.forEach(user => {
+                    const h = document.createElement('h2');
+                    h.textContent = "Record - " + user.index + "/148";
+                    dataContainer.appendChild(h);
+
+                    const hh = document.createElement('h3');
+                    hh.textContent = user.properties_id;
+                    dataContainer.appendChild(hh);
+
+                    const p = document.createElement('p');
+                    p.textContent = "Coordinates: " + "[" + user.lat + "," + user.long + "]" + "   ";
+                    p.textContent += "Variable: " + "[" + user.variable + "]" + "   ";
+                    p.textContent += "Labeling Results: "+ "[" +  user.anno_1 + ", " + user.anno_2 + ", " + user.anno_0 + "]";
+                    dataContainer.appendChild(p);
+                    dataContainer.appendChild(document.createElement('br'));
+
+                    const pp = document.createElement('p');
+                    pp.innerHTML = "<img src=\"" + user.img_g_url + "\" width=\"1200px\" >";
+
+                    dataContainer.appendChild(pp);
+                    dataContainer.appendChild(document.createElement('br'));
+
+
+
+
+                });
+            })
+            .catch(error => {
+                // Handle any errors that occurred during the fetch operation
+                console.error('There was a problem with the fetch operation:', error);
+            });
+
+
+</script>
+
+
+</html>
