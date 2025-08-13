@@ -186,32 +186,32 @@
             });
 
 
-            // To display a popup
-            var mypopup = new mapboxgl.Popup({offset:[10, 10],closeButton: true})
+            // // To display a popup
+            // var mypopup = new mapboxgl.Popup({offset:[10, 10],closeButton: true})
 
-            // Another event listener that adds the popup when the user puts their cursor over the tube circles
-            map.on('click', 'zipcode_homeless', function(e){
-                mypopup
-                    .setLngLat(e.lngLat)
-                    .setHTML("<h3> Zipcode - " + e.features[0].properties.GEOID20 +  "</h3> " + "<h4>Count: " + e.features[0].properties.FY24 +  "</h4> ")
-                    .addTo(map);
-            });
+            // // Another event listener that adds the popup when the user puts their cursor over the tube circles
+            // map.on('click', 'zipcode_homeless', function(e){
+            //     mypopup
+            //         .setLngLat(e.lngLat)
+            //         .setHTML("<h3> Zipcode - " + e.features[0].properties.GEOID20 +  "</h3> " + "<h4>Count: " + e.features[0].properties.FY24 +  "</h4> ")
+            //         .addTo(map);
+            // });
 
-            // Change the cursor to a pointer when the mouse is over the stations layer.
-            map.on('mouseenter', 'zipcode_homeless', function () {
-                  map.getCanvas().style.cursor = 'pointer';
-            });
+            // // Change the cursor to a pointer when the mouse is over the stations layer.
+            // map.on('mouseenter', 'zipcode_homeless', function () {
+            //       map.getCanvas().style.cursor = 'pointer';
+            // });
 
-            // Change it back to a pointer when it leaves and remove the popup window.
-            map.on('mouseleave', 'zipcode_homeless', function () {
-                map.getCanvas().style.cursor = '';
-                mypopup.remove();
-            });
+            // // Change it back to a pointer when it leaves and remove the popup window.
+            // map.on('mouseleave', 'zipcode_homeless', function () {
+            //     map.getCanvas().style.cursor = '';
+            //     mypopup.remove();
+            // });
 
         })
 
 
-        // Add an event listener when users clicking on "zoom in to Denver" 
+        // Add an event listener when users clicking on "zoom in to Buffalo" 
         document.getElementById('buf_view').addEventListener('click', function(e){
 
             map.flyTo({
@@ -228,4 +228,5 @@
 </script>
 
 </body>
+
 </html>
