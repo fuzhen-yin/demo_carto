@@ -1,0 +1,231 @@
+<html>
+
+<head>
+<meta charset="utf-8" />
+<title>Mapbox Example 8- Proportional Circles</title>
+
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js"></script>
+
+
+<link href = 'FY_2024_map_style.css' rel = 'stylesheet' />
+
+</head>
+
+<body>
+<div id="map"></div>
+<div class='map-overlay'> 
+    <div class='map-overlay-inner'>
+        <h1> Homeless in Western New York</h1>
+        <p class="inner_text_p"> This map presents the count of homeless people by zipcode in five counties in Western New York. The five counties include Erie, Niagara, Genesee, Orleans and Wyoming. Data sources: <a href="https://wnyhomeless.org/"> Homeless Alliance of Western New York </a>. </p>
+
+        <p><table><tr><td>
+        <input type="radio" name="layers" id="layer1" value="FY2023" checked><label>2023 &nbsp; &nbsp;</label>
+        <input type="radio" name="layers" id="layer2" value="FY2024"><label>2024 </label>
+         </td>
+         </tr>
+         </table></p>
+    
+
+        <p class="inner_text_p"> Zoom to <a href="#" class="inner_text_p" id="buf_view">Buffalo</a> </p>
+
+        <br>
+
+        <h2 id="laname">Hover over a local zipcode!</h2>
+        
+    </div>
+</div>
+
+
+
+<script>
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoianVuemhpbWFnZXIiLCJhIjoiY2s5eHBpdzkzMDVkZjNtcnQybzd6YmlxcyJ9.9porJ3w9YRjSl6X0Mx-WUg'; 
+
+        // Load a new map in the 'map' HTML div
+        var map = new mapboxgl.Map({
+            container: 'map', // container id
+            style: 'mapbox://styles/junzhimager/cme9egfwj003u01r9aru52syi', 
+            center: [ -78.57963126394121, 42.994826642457106], // starting position [lng, lat]
+            zoom: 8.5 // starting zoom
+        });
+
+
+        
+        map.on('load', function() {
+
+            // Add standard navigation control
+            map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');   
+
+            // Add a polygon layer and color it based on homeless count 
+            map.addLayer({
+                'id':'zipcode_homeless',
+                'type':'fill',
+                'source':{
+                    type:'vector',
+                    url:'mapbox://junzhimager.3ik9j646' // Your Mapbox tileset Map ID
+                },
+                'source-layer':'01_homeless_by_zip_FY23_24-5sra1i', // name of tilesets
+                'layout':{
+                    'visibility': 'visible'
+                },
+                'paint': {
+                    'fill-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'FY23'],
+                        0, 'white',
+                        7, '#F9DDDA',
+                        17, '#F3BEC7',
+                        30, '#E8A0BC',
+                        45, '#D785B5',
+                        64, '#BF6DB0',
+                        99, '#A159A9',
+                        246, '#7C489C',
+                        429, '#573B88'
+                    ],
+                    'fill-opacity': 0.8, 
+                    'fill-outline-color': 'white'
+                }
+            });
+
+            // Highlight Layer
+            map.addLayer({
+                id: 'lahighlight',
+                type: 'line',
+                source: {
+                    type: 'vector',
+                    url: 'mapbox://junzhimager.3ik9j646' // Your Mapbox tileset Map ID
+                },
+                'source-layer': '01_homeless_by_zip_FY23_24-5sra1i', // name of tilesets
+                'layout': {
+                    'visibility': 'visible'
+                },
+                paint: {
+                    'line-color': '#adf',
+                    'line-width': 4
+                },
+                filter: ['==','GEOID20','empty']
+            });
+
+            // Add a line layer to mark five counties boundary 
+            map.addLayer({
+                'id':'wny_five_county_boundary',
+                'type':'line',
+                'source':{
+                    type:'vector',
+                    url:'mapbox://junzhimager.3m2q52sw' // Your Mapbox tileset Map ID
+                },
+                'source-layer':'02_five_county_boundary-3nevic', // name of tilesets
+                'layout':{
+                    'visibility': 'visible'
+                },
+                'paint': {
+                    'line-color': '#000',
+                    'line-width': 1
+                }
+            });
+
+            //Event listener for layer switch
+            document.getElementById("layer1").addEventListener("click", function(){
+                map.setPaintProperty('zipcode_homeless','fill-color',[
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'FY23'],
+                        0, 'white',
+                        7, '#F9DDDA',
+                        17, '#F3BEC7',
+                        30, '#E8A0BC',
+                        45, '#D785B5',
+                        64, '#BF6DB0',
+                        99, '#A159A9',
+                        246, '#7C489C',
+                        429, '#573B88'
+                    ]); 
+                map.setPaintProperty('zipcode_homeless','fill-outline-color','white'); 
+            });
+
+            document.getElementById("layer2").addEventListener("click", function(){
+                map.setPaintProperty('zipcode_homeless','fill-color',[
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'FY24'],
+                        0, 'white',
+                        14, '#D2FBD4',
+                        38, '#ABDFC4',
+                        72, '#87C4B5',
+                        101, '#65A9A5',
+                        150, '#498E95',
+                        196, '#337382',
+                        401, '#20586E',
+                        514, '#123F5A'
+                    ]); 
+                map.setPaintProperty('zipcode_homeless','fill-outline-color','white'); 
+            });
+
+
+            // Hover Over 
+            map.on('mousemove', function(e) {
+                var la = map.queryRenderedFeatures(e.point, {
+                    layers: ['zipcode_homeless']
+                });
+
+                if (la.length==1) {
+
+                    map.setFilter('lahighlight', ['==','GEOID20',la[0].properties.GEOID20]);
+                    console.log(la[0].properties.GEOID20);
+                    document.getElementById('laname').innerHTML = la[0].properties.GEOID20 + " has " + la[0].properties.FY23 + " in 2023, and " + la[0].properties.FY24 + " in 2024";
+                    console.log(la[0].id);
+                    console.log(la);
+                } else {
+                    map.setFilter('lahighlight', ['==','GEOID20','null']);
+                    console.log('No features');
+                    document.getElementById('laname').innerHTML = "Hover over a local area!";
+                }
+            });
+
+
+            // To display a popup
+            var mypopup = new mapboxgl.Popup({offset:[10, 10],closeButton: true})
+
+            // Another event listener that adds the popup when the user puts their cursor over the tube circles
+            map.on('click', 'zipcode_homeless', function(e){
+                mypopup
+                    .setLngLat(e.lngLat)
+                    .setHTML("<h3> Zipcode - " + e.features[0].properties.GEOID20 +  "</h3> " + "<h4>Count: " + e.features[0].properties.FY24 +  "</h4> ")
+                    .addTo(map);
+            });
+
+            // Change the cursor to a pointer when the mouse is over the stations layer.
+            map.on('mouseenter', 'zipcode_homeless', function () {
+                  map.getCanvas().style.cursor = 'pointer';
+            });
+
+            // Change it back to a pointer when it leaves and remove the popup window.
+            map.on('mouseleave', 'zipcode_homeless', function () {
+                map.getCanvas().style.cursor = '';
+                mypopup.remove();
+            });
+
+        })
+
+
+        // Add an event listener when users clicking on "zoom in to Denver" 
+        document.getElementById('buf_view').addEventListener('click', function(e){
+
+            map.flyTo({
+                center:[-78.84567933111838, 42.90186038249924],
+                zoom:11,
+                speed:0.3
+            })
+        })
+
+
+
+
+
+</script>
+
+</body>
+</html>
