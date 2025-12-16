@@ -1,0 +1,117 @@
+<html>
+<head>
+    <title>GPT Results Analysis - 110 imgs - 1204</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .filters {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background: #f8f8f8;
+        }
+        .entry { margin-bottom: 50px; }
+        select { margin-right: 20px; }
+    </style>
+</head>
+
+<body>
+    <h1>GPT Results Analysis - 110 imgs</h1>
+    <p>Evaluating GPT's annotation accuracy for prompt engineering (December 4th).</p>
+
+    <!-- FILTER CONTROLS -->
+    <div class="filters">
+        <label>
+            Matching:
+            <select id="matchingFilter">
+                <option value="ALL">All</option>
+                <option value="TRUE">TRUE</option>
+                <option value="FALSE">FALSE</option>
+            </select>
+        </label>
+
+        <label>
+            Feature:
+            <select id="featureFilter">
+                <option value="ALL">All</option>
+                <option value="Bike Lane">Bike Lane</option>
+                <option value="Building Frontage">Building Frontage</option>
+                <option value="Greenery Coverage">Greenery Coverage</option>
+                <option value="Mountain View">Mountain View</option>
+                <option value="Pedestrian Count">Pedestrian Count</option>
+                <option value="Perceived Safety">Perceived Safety</option>
+                <option value="Sidewalk">Sidewalk</option>
+                <option value="Sky View">Sky View</option>
+                <option value="Stormwater Infrastructure">Stormwater Infrastructure</option>
+                <option value="Street Light">Street Light</option>
+            </select>
+        </label>
+    </div>
+
+    <div id="img_data_container"></div>
+
+<script>
+    const url = 'https://raw.githubusercontent.com/fuzhen-yin/2025_carto_test/refs/heads/main/anno_data/1204_110_img_gpt_5_results_web.json';
+
+    const container = document.getElementById('img_data_container');
+    const matchingFilter = document.getElementById('matchingFilter');
+    const featureFilter = document.getElementById('featureFilter');
+
+    let allData = [];
+
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            allData = data;
+            render();
+        })
+        .catch(err => console.error(err));
+
+    matchingFilter.addEventListener('change', render);
+    featureFilter.addEventListener('change', render);
+
+    function render() {
+        container.innerHTML = '';
+
+        const matchVal = matchingFilter.value;
+        const featureVal = featureFilter.value;
+
+        allData
+            .filter(user => {
+                if (matchVal !== 'ALL' && user.matching !== matchVal) return false;
+                if (featureVal !== 'ALL' && user.feature !== featureVal) return false;
+                return true;
+            })
+            .forEach(user => {
+
+                const entry = document.createElement('div');
+                entry.className = 'entry';
+
+                const h2 = document.createElement('h2');
+                h2.textContent = "If GPT Annotation Matches the Ground Truth ID: " + user.matching;
+
+                const h3 = document.createElement('h3');
+                h3.textContent = user.id + " _____ Feature: " + user.feature;
+
+                const p = document.createElement('p');
+                p.textContent =
+                    "Part of the Ground Truth Dataset: " + user.has_seen + ". " +
+                    "_____ Ground Truth / GPT: " + user.label_true + " / " + user.label_gpt_5 + " _____ " +
+                    "_____ GPT Explanation: " + user.cot_reasoning;
+
+                const img = document.createElement('img');
+                img.src = user.img_url;
+                img.width = 1200;
+
+                entry.appendChild(h2);
+                entry.appendChild(h3);
+                entry.appendChild(p);
+                entry.appendChild(document.createElement('br'));
+                entry.appendChild(img);
+
+                container.appendChild(entry);
+            });
+    }
+</script>
+
+</body>
+</html>
